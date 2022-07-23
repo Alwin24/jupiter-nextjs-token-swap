@@ -64,17 +64,7 @@ const SiteDescription = () => {
             <div className="hero">
                 <div className="text-center hero-content">
                     <div>
-                        <h1 className="mb-5 text-5xl font-bold">
-                            Hello Solana <SolanaLogo /> World!
-                        </h1>
-
                         <div className="max-w-md">
-                            <p className="mb-5">
-                                This scaffold includes awesome tools for rapid development and
-                                deploy dapps to Solana: Next.JS, TypeScript, TailwindCSS,
-                                Daisy UI.
-                            </p>
-                            <p className="mb-5">Solana wallet adapter is connected and ready to use.</p>
                             <p className="mb-5">Environment: {ENV}</p>
                             {publicKey
                                 ? (
