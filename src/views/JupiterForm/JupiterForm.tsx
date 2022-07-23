@@ -17,7 +17,7 @@ import JSBI from "jsbi";
 import Decimal from "decimal.js";
 import { SECOND_TO_REFRESH } from "../../pages/_app";
 
-interface IJupiterFormProps {}
+interface IJupiterFormProps { }
 type UseJupiterProps = Parameters<typeof useJupiter>[0];
 
 const JupiterForm: FunctionComponent<IJupiterFormProps> = (props) => {
@@ -26,9 +26,9 @@ const JupiterForm: FunctionComponent<IJupiterFormProps> = (props) => {
   const [tokenMap, setTokenMap] = useState<Map<string, TokenInfo>>(new Map());
 
   const [formValue, setFormValue] = useState<
-    Omit<UseJupiterProps, "amount"> & { amount: Decimal }
+    Omit<UseJupiterProps, "amount"> & { amount: number }
   >({
-    amount: new Decimal(1), // unit in lamports (Decimals)
+    amount: 1, // unit in lamports (Decimals)
     inputMint: new PublicKey(INPUT_MINT_ADDRESS),
     outputMint: new PublicKey(OUTPUT_MINT_ADDRESS),
     slippage: 1, // 0.1%
@@ -60,7 +60,7 @@ const JupiterForm: FunctionComponent<IJupiterFormProps> = (props) => {
 
   const amountInInteger = useMemo(() => {
     return JSBI.BigInt(
-      formValue.amount.mul(10 ** (inputTokenInfo?.decimals || 1))
+      formValue.amount * (10 ** (inputTokenInfo?.decimals || 1))
     );
   }, [inputTokenInfo, formValue.amount]);
 
@@ -188,19 +188,16 @@ const JupiterForm: FunctionComponent<IJupiterFormProps> = (props) => {
             id="amount"
             className="shadow-sm bg-neutral p-2 focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
             value={formValue.amount.toString()}
-            type="text"
-            pattern="[0-9]*"
+            type="number"
             onInput={(e: any) => {
               let newValue = e.target?.value || "0";
 
-              let newAmount = new Decimal(newValue);
+              if (newValue < 0)
+                newValue = "0";
 
-              if (newAmount.lessThan(0)) {
-                newAmount = new Decimal(0);
-              }
               setFormValue((val) => ({
                 ...val,
-                amount: newAmount,
+                amount: newValue,
               }));
             }}
           />
@@ -209,9 +206,8 @@ const JupiterForm: FunctionComponent<IJupiterFormProps> = (props) => {
 
       <div className="flex justify-center items-center mt-4">
         <button
-          className={`${
-            loading ? "opacity-50 cursor-not-allowed" : ""
-          } inline-flex items-center px-4 py-2 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 space-x-2`}
+          className={`${loading ? "opacity-50 cursor-not-allowed" : ""
+            } inline-flex items-center px-4 py-2 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 space-x-2`}
           type="button"
           onClick={refresh}
           disabled={loading}
